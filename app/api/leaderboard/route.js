@@ -4,13 +4,20 @@ import { getDefaultSessionId, getSessionEntries, deleteEntry } from '../../../li
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const sessionId = searchParams.get('sessionId') || await getDefaultSessionId();
+    let sessionId = searchParams.get('sessionId');
+    
+    if (!sessionId) {
+      sessionId = await getDefaultSessionId();
+    }
 
+    console.log(`Fetching leaderboard for session: ${sessionId}`);
     const leaderboard = await getSessionEntries(sessionId);
+    console.log(`Found ${leaderboard.length} entries for session ${sessionId}`);
 
     return NextResponse.json({ leaderboard, sessionId });
   } catch (error) {
     console.error('Leaderboard GET error:', error);
+    console.error('Error stack:', error.stack);
     return NextResponse.json({ leaderboard: [], sessionId: 'default' });
   }
 }

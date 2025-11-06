@@ -12,18 +12,32 @@ export default function TrainerPage() {
 
   async function load() {
     try {
-      // load sessions first if needed
-      if (!sessions.length) {
-        const s = await fetch('/api/sessions', { cache: 'no-store' }).then(r => r.json());
-        setSessions(s.sessions || []);
-        if (!sessionId && s.sessions?.length) setSessionId(s.sessions[0].id);
+      // Always load sessions first
+      const sRes = await fetch('/api/sessions', { cache: 'no-store' });
+      const sData = await sRes.json();
+      const sessionsList = sData.sessions || [];
+      setSessions(sessionsList);
+      
+      // Set sessionId if not set or if current sessionId doesn't exist
+      let currentSessionId = sessionId;
+      if (!currentSessionId && sessionsList.length > 0) {
+        currentSessionId = sessionsList[0].id;
+        setSessionId(currentSessionId);
+      } else if (currentSessionId && !sessionsList.find(s => s.id === currentSessionId)) {
+        // Current session doesn't exist, use first available
+        currentSessionId = sessionsList.length > 0 ? sessionsList[0].id : 'default';
+        setSessionId(currentSessionId);
       }
-      const qs = sessionId ? `?sessionId=${encodeURIComponent(sessionId)}` : '';
+      
+      // Load leaderboard for current session
+      const qs = currentSessionId ? `?sessionId=${encodeURIComponent(currentSessionId)}` : '';
       const res = await fetch(`/api/leaderboard${qs}`, { cache: 'no-store' });
       const data = await res.json();
+      console.log('Leaderboard data:', { sessionId: currentSessionId, count: data.leaderboard?.length || 0 });
       setItems(data.leaderboard || []);
-    } catch (_e) {
-      // noop
+    } catch (error) {
+      console.error('Load error:', error);
+      setItems([]);
     } finally {
       setLoading(false);
     }
@@ -34,6 +48,13 @@ export default function TrainerPage() {
     const id = setInterval(load, 5000);
     return () => clearInterval(id);
   }, [sessionId]);
+
+  // Also reload when sessions change
+  useEffect(() => {
+    if (sessions.length > 0 && !sessionId) {
+      setSessionId(sessions[0].id);
+    }
+  }, [sessions]);
 
   async function resetSession() {
     setResetting(true);
