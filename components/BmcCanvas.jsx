@@ -75,7 +75,7 @@ const BMC_CONFIG = {
   },
 };
 
-function BmcBlock({ blockKey, value, onChange, placeholder, minHeight, className = '' }) {
+function BmcBlock({ blockKey, value, onChange, placeholder, minHeight = '120px', className = '' }) {
   const config = BMC_CONFIG[blockKey];
   return (
     <div className={`p-3 border-2 rounded-lg shadow-sm ${config.bgColor} ${config.borderColor} ${className}`}>
@@ -84,7 +84,7 @@ function BmcBlock({ blockKey, value, onChange, placeholder, minHeight, className
         <span className="font-semibold text-sm">{config.title}</span>
       </div>
       <textarea
-        className={`w-full border ${config.borderColor} p-2 rounded mt-2 text-sm ${config.bgColor} focus:ring-2 focus:ring-offset-1 focus:${config.borderColor.replace('border-', 'ring-')}`}
+        className={`w-full border ${config.borderColor} p-2 rounded mt-2 text-sm ${config.bgColor} focus:ring-2 focus:ring-offset-1`}
         style={{ minHeight }}
         value={value}
         onChange={(e) => onChange(e.target.value)}
