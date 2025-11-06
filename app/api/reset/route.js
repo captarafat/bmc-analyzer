@@ -1,17 +1,20 @@
 import { NextResponse } from 'next/server';
+import { sql } from '@vercel/postgres';
+import { getDefaultSessionId } from '../../../lib/db';
 
 export async function POST(request) {
-  const body = await request.json().catch(() => ({}));
-  const sessionId = body?.sessionId;
-  if (globalThis.sessions && sessionId && globalThis.sessions.byId?.[sessionId]) {
-    globalThis.sessions.byId[sessionId].entries = [];
-  } else if (globalThis.sessions) {
-    const current = globalThis.sessions.order?.[0];
-    if (current) globalThis.sessions.byId[current].entries = [];
-  } else {
-    globalThis.leaderboard = [];
+  try {
+    const body = await request.json().catch(() => ({}));
+    const sessionId = body?.sessionId || await getDefaultSessionId();
+
+    await sql`
+      DELETE FROM entries
+      WHERE session_id = ${sessionId}
+    `;
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error('Reset error:', error);
+    return NextResponse.json({ ok: false, error: 'Failed to reset' }, { status: 500 });
   }
-  return NextResponse.json({ ok: true });
 }
-
-

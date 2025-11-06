@@ -1,39 +1,59 @@
 import { NextResponse } from 'next/server';
-
-function ensureSessions() {
-  if (!globalThis.sessions) {
-    const defaultId = 'default';
-    globalThis.sessions = {
-      order: [defaultId],
-      byId: {
-        [defaultId]: { id: defaultId, name: 'Sesi Utama', createdAt: Date.now(), entries: [] },
-      },
-    };
-  }
-}
+import { sql } from '@vercel/postgres';
+import { getDefaultSessionId } from '../../../lib/db';
 
 export async function GET(request) {
-  ensureSessions();
-  const { searchParams } = new URL(request.url);
-  const sessionId = searchParams.get('sessionId') || globalThis.sessions.order[0];
-  const session = globalThis.sessions.byId[sessionId];
-  const sorted = [...(session?.entries || [])].sort((a, b) => b.score - a.score || a.at - b.at);
-  return NextResponse.json({ leaderboard: sorted, sessionId });
+  try {
+    const { searchParams } = new URL(request.url);
+    const sessionId = searchParams.get('sessionId') || await getDefaultSessionId();
+
+    const entries = await sql`
+      SELECT 
+        id,
+        name,
+        idea,
+        score,
+        blocks,
+        analysis,
+        created_at as "at"
+      FROM entries
+      WHERE session_id = ${sessionId}
+      ORDER BY score DESC, created_at ASC
+    `;
+
+    const leaderboard = entries.rows.map((row) => ({
+      name: row.name,
+      idea: row.idea,
+      score: Number(row.score),
+      at: Number(row.at),
+      blocks: row.blocks,
+      analysis: row.analysis,
+    }));
+
+    return NextResponse.json({ leaderboard, sessionId });
+  } catch (error) {
+    console.error('Leaderboard GET error:', error);
+    return NextResponse.json({ leaderboard: [], sessionId: 'default' });
+  }
 }
 
 export async function DELETE(request) {
-  ensureSessions();
   try {
     const { at, sessionId } = await request.json();
-    const sid = sessionId && globalThis.sessions.byId[sessionId] ? sessionId : globalThis.sessions.order[0];
-    const entries = globalThis.sessions.byId[sid].entries;
-    const before = entries.length;
-    globalThis.sessions.byId[sid].entries = entries.filter((item) => item.at !== at);
-    const removed = before - globalThis.sessions.byId[sid].entries.length;
-    return NextResponse.json({ ok: true, removed });
-  } catch (_e) {
+    if (!at) {
+      return NextResponse.json({ ok: false, error: 'Missing entry ID' }, { status: 400 });
+    }
+
+    const sid = sessionId || await getDefaultSessionId();
+    
+    const result = await sql`
+      DELETE FROM entries
+      WHERE created_at = ${at} AND session_id = ${sid}
+    `;
+
+    return NextResponse.json({ ok: true, removed: result.rowCount || 0 });
+  } catch (error) {
+    console.error('Leaderboard DELETE error:', error);
     return NextResponse.json({ ok: false, error: 'Bad request' }, { status: 400 });
   }
 }
-
-
