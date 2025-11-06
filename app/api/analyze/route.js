@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { sql } from '@vercel/postgres';
-import { getDefaultSessionId } from '../../../lib/db';
+import { getDefaultSessionId, saveEntry } from '../../../lib/db';
 
 const BLOCK_KEYS = [
   'keyPartners',
@@ -187,30 +186,16 @@ export async function POST(request) {
   // Simpan ke database
   try {
     const sid = sessionId || await getDefaultSessionId();
-    const entryId = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
     const createdAt = Date.now();
-
-    // Ensure session exists
-    await sql`
-      INSERT INTO sessions (id, name, created_at, display_order)
-      VALUES (${sid}, ${sid === 'default' ? 'Sesi Utama' : 'Sesi Baru'}, ${createdAt}, 0)
-      ON CONFLICT (id) DO NOTHING
-    `;
-
-    // Insert entry
-    await sql`
-      INSERT INTO entries (id, session_id, name, idea, score, blocks, analysis, created_at)
-      VALUES (
-        ${entryId},
-        ${sid},
-        ${String(studentName)},
-        ${String(businessIdea)},
-        ${overall},
-        ${JSON.stringify(blocks)},
-        ${JSON.stringify(response)},
-        ${createdAt}
-      )
-    `;
+    
+    await saveEntry(sid, {
+      name: String(studentName),
+      idea: String(businessIdea),
+      score: overall,
+      blocks,
+      analysis: response,
+      at: createdAt,
+    });
   } catch (dbError) {
     console.error('Database save error:', dbError);
     // Continue - don't fail the request if DB fails

@@ -1,16 +1,12 @@
 import { NextResponse } from 'next/server';
-import { sql } from '@vercel/postgres';
-import { getDefaultSessionId } from '../../../lib/db';
+import { getDefaultSessionId, resetSession } from '../../../lib/db';
 
 export async function POST(request) {
   try {
     const body = await request.json().catch(() => ({}));
     const sessionId = body?.sessionId || await getDefaultSessionId();
 
-    await sql`
-      DELETE FROM entries
-      WHERE session_id = ${sessionId}
-    `;
+    await resetSession(sessionId);
 
     return NextResponse.json({ ok: true });
   } catch (error) {
