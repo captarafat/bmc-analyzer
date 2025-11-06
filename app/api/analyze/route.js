@@ -188,7 +188,7 @@ export async function POST(request) {
     const sid = sessionId || await getDefaultSessionId();
     const createdAt = Date.now();
     
-    await saveEntry(sid, {
+    const entryId = await saveEntry(sid, {
       name: String(studentName),
       idea: String(businessIdea),
       score: overall,
@@ -196,9 +196,20 @@ export async function POST(request) {
       analysis: response,
       at: createdAt,
     });
+    
+    if (!entryId) {
+      console.error('Failed to save entry - Redis may not be configured');
+    } else {
+      console.log(`Successfully saved entry ${entryId} for ${studentName}`);
+    }
   } catch (dbError) {
     console.error('Database save error:', dbError);
-    // Continue - don't fail the request if DB fails
+    console.error('Error details:', {
+      message: dbError.message,
+      stack: dbError.stack,
+      studentName,
+    });
+    // Continue - don't fail the request if DB fails, but log it
   }
 
   return NextResponse.json(response);
