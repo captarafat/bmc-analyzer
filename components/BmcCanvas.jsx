@@ -1,105 +1,184 @@
 'use client';
 
+const BMC_CONFIG = {
+  keyPartners: {
+    icon: '🤝',
+    title: 'Rakan Kongsi Utama',
+    bgColor: 'bg-blue-50',
+    borderColor: 'border-blue-200',
+    textColor: 'text-blue-800',
+    headerBg: 'bg-blue-100',
+  },
+  keyActivities: {
+    icon: '⚡',
+    title: 'Aktiviti Utama',
+    bgColor: 'bg-purple-50',
+    borderColor: 'border-purple-200',
+    textColor: 'text-purple-800',
+    headerBg: 'bg-purple-100',
+  },
+  keyResources: {
+    icon: '🏭',
+    title: 'Sumber Utama',
+    bgColor: 'bg-indigo-50',
+    borderColor: 'border-indigo-200',
+    textColor: 'text-indigo-800',
+    headerBg: 'bg-indigo-100',
+  },
+  valuePropositions: {
+    icon: '🎁',
+    title: 'Tawaran Nilai',
+    bgColor: 'bg-emerald-50',
+    borderColor: 'border-emerald-200',
+    textColor: 'text-emerald-800',
+    headerBg: 'bg-emerald-100',
+  },
+  customerRelationships: {
+    icon: '❤️',
+    title: 'Hubungan dengan Pelanggan',
+    bgColor: 'bg-pink-50',
+    borderColor: 'border-pink-200',
+    textColor: 'text-pink-800',
+    headerBg: 'bg-pink-100',
+  },
+  channels: {
+    icon: '🚚',
+    title: 'Saluran',
+    bgColor: 'bg-orange-50',
+    borderColor: 'border-orange-200',
+    textColor: 'text-orange-800',
+    headerBg: 'bg-orange-100',
+  },
+  customerSegments: {
+    icon: '👥',
+    title: 'Segmen Pelanggan',
+    bgColor: 'bg-cyan-50',
+    borderColor: 'border-cyan-200',
+    textColor: 'text-cyan-800',
+    headerBg: 'bg-cyan-100',
+  },
+  costStructure: {
+    icon: '💰',
+    title: 'Struktur Kos',
+    bgColor: 'bg-red-50',
+    borderColor: 'border-red-200',
+    textColor: 'text-red-800',
+    headerBg: 'bg-red-100',
+  },
+  revenueStreams: {
+    icon: '💵',
+    title: 'Aliran Pendapatan',
+    bgColor: 'bg-green-50',
+    borderColor: 'border-green-200',
+    textColor: 'text-green-800',
+    headerBg: 'bg-green-100',
+  },
+};
+
+function BmcBlock({ blockKey, value, onChange, placeholder, minHeight, className = '' }) {
+  const config = BMC_CONFIG[blockKey];
+  return (
+    <div className={`p-3 border-2 rounded-lg shadow-sm ${config.bgColor} ${config.borderColor} ${className}`}>
+      <div className={`${config.headerBg} ${config.textColor} px-2 py-1.5 rounded mb-2 flex items-center gap-2`}>
+        <span className="text-lg">{config.icon}</span>
+        <span className="font-semibold text-sm">{config.title}</span>
+      </div>
+      <textarea
+        className={`w-full border ${config.borderColor} p-2 rounded mt-2 text-sm ${config.bgColor} focus:ring-2 focus:ring-offset-1 focus:${config.borderColor.replace('border-', 'ring-')}`}
+        style={{ minHeight }}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+      />
+    </div>
+  );
+}
+
 export default function BmcCanvas({ blocks, setBlocks }) {
   return (
     <div className="space-y-4">
       {/* Kawasan atas + baris kecil digabungkan dalam 1 grid 2-baris */}
       <div className="grid grid-cols-1 md:grid-cols-5 md:grid-rows-2 md:auto-rows-fr gap-4">
         {/* Col 1 - span dua baris */}
-        <div className="p-3 border rounded-lg bg-white shadow-sm md:row-span-2 h-full">
-          <div className="font-semibold text-gray-700">Rakan Kongsi Utama</div>
-          <textarea
-            className="w-full border p-2 rounded mt-2 text-sm min-h-[220px] md:min-h-[320px] lg:min-h-[380px]"
-            value={blocks.keyPartners}
-            onChange={(e) => setBlocks({ ...blocks, keyPartners: e.target.value })}
-            placeholder="Rakan utama dan pembekal"
-          />
-        </div>
+        <BmcBlock
+          blockKey="keyPartners"
+          value={blocks.keyPartners}
+          onChange={(v) => setBlocks({ ...blocks, keyPartners: v })}
+          placeholder="Rakan utama dan pembekal"
+          minHeight="220px"
+          className="md:row-span-2 h-full"
+        />
         {/* Col 2 - baris atas */}
-        <div className="p-3 border rounded-lg bg-white shadow-sm md:row-start-1 md:col-start-2 h-full">
-          <div className="font-semibold text-gray-700">Aktiviti Utama</div>
-          <textarea
-            className="w-full border p-2 rounded mt-2 text-sm min-h-[140px] md:min-h-[180px]"
-            value={blocks.keyActivities}
-            onChange={(e) => setBlocks({ ...blocks, keyActivities: e.target.value })}
-            placeholder="Aktiviti teras"
-          />
-        </div>
+        <BmcBlock
+          blockKey="keyActivities"
+          value={blocks.keyActivities}
+          onChange={(v) => setBlocks({ ...blocks, keyActivities: v })}
+          placeholder="Aktiviti teras"
+          minHeight="140px"
+          className="md:row-start-1 md:col-start-2 h-full"
+        />
         {/* Col 3 - span dua baris */}
-        <div className="p-3 border rounded-lg bg-white shadow-sm md:row-span-2 md:col-start-3 h-full">
-          <div className="font-semibold text-gray-700">Tawaran Nilai</div>
-          <textarea
-            className="w-full border p-2 rounded mt-2 text-sm min-h-[220px] md:min-h-[320px] lg:min-h-[380px]"
-            value={blocks.valuePropositions}
-            onChange={(e) => setBlocks({ ...blocks, valuePropositions: e.target.value })}
-            placeholder="Nilai unik kepada pelanggan"
-          />
-        </div>
+        <BmcBlock
+          blockKey="valuePropositions"
+          value={blocks.valuePropositions}
+          onChange={(v) => setBlocks({ ...blocks, valuePropositions: v })}
+          placeholder="Nilai unik kepada pelanggan"
+          minHeight="220px"
+          className="md:row-span-2 md:col-start-3 h-full"
+        />
         {/* Col 4 - baris atas */}
-        <div className="p-3 border rounded-lg bg-white shadow-sm md:row-start-1 md:col-start-4 h-full">
-          <div className="font-semibold text-gray-700">Hubungan dengan Pelanggan</div>
-          <textarea
-            className="w-full border p-2 rounded mt-2 text-sm min-h-[140px] md:min-h-[180px]"
-            value={blocks.customerRelationships}
-            onChange={(e) => setBlocks({ ...blocks, customerRelationships: e.target.value })}
-            placeholder="Jenis hubungan dengan pelanggan"
-          />
-        </div>
+        <BmcBlock
+          blockKey="customerRelationships"
+          value={blocks.customerRelationships}
+          onChange={(v) => setBlocks({ ...blocks, customerRelationships: v })}
+          placeholder="Jenis hubungan dengan pelanggan"
+          minHeight="140px"
+          className="md:row-start-1 md:col-start-4 h-full"
+        />
         {/* Col 5 - span dua baris */}
-        <div className="p-3 border rounded-lg bg-white shadow-sm md:row-span-2 md:col-start-5 h-full">
-          <div className="font-semibold text-gray-700">Segmen Pelanggan</div>
-          <textarea
-            className="w-full border p-2 rounded mt-2 text-sm min-h-[220px] md:min-h-[320px] lg:min-h-[380px]"
-            value={blocks.customerSegments}
-            onChange={(e) => setBlocks({ ...blocks, customerSegments: e.target.value })}
-            placeholder="Segmen pelanggan sasaran"
-          />
-        </div>
+        <BmcBlock
+          blockKey="customerSegments"
+          value={blocks.customerSegments}
+          onChange={(v) => setBlocks({ ...blocks, customerSegments: v })}
+          placeholder="Segmen pelanggan sasaran"
+          minHeight="220px"
+          className="md:row-span-2 md:col-start-5 h-full"
+        />
         {/* Resources di bawah Activities (col 2, row 2) */}
-        <div className="p-3 border rounded-lg bg-white shadow-sm md:col-start-2 md:row-start-2 h-full">
-          <div className="font-semibold text-gray-700">Sumber Utama</div>
-          <textarea
-            className="w-full border p-2 rounded mt-2 text-sm min-h-[140px] md:min-h-[180px]"
-            value={blocks.keyResources}
-            onChange={(e) => setBlocks({ ...blocks, keyResources: e.target.value })}
-            placeholder="Sumber utama (manusia, teknologi, kewangan)"
-          />
-        </div>
+        <BmcBlock
+          blockKey="keyResources"
+          value={blocks.keyResources}
+          onChange={(v) => setBlocks({ ...blocks, keyResources: v })}
+          placeholder="Sumber utama (manusia, teknologi, kewangan)"
+          minHeight="140px"
+          className="md:col-start-2 md:row-start-2 h-full"
+        />
         {/* Channels di bawah Relationships (col 4, row 2) */}
-        <div className="p-3 border rounded-lg bg-white shadow-sm md:col-start-4 md:row-start-2 h-full">
-          <div className="font-semibold text-gray-700">Saluran</div>
-          <textarea
-            className="w-full border p-2 rounded mt-2 text-sm min-h-[140px] md:min-h-[180px]"
-            value={blocks.channels}
-            onChange={(e) => setBlocks({ ...blocks, channels: e.target.value })}
-            placeholder="Saluran capai pelanggan"
-          />
-        </div>
+        <BmcBlock
+          blockKey="channels"
+          value={blocks.channels}
+          onChange={(v) => setBlocks({ ...blocks, channels: v })}
+          placeholder="Saluran capai pelanggan"
+          minHeight="140px"
+          className="md:col-start-4 md:row-start-2 h-full"
+        />
       </div>
 
       {/* Baris bawah: 2 kolum sama besar */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="p-3 border rounded-lg bg-white shadow-sm">
-          <div className="font-semibold text-gray-700">Struktur Kos</div>
-          <textarea
-            className="w-full border p-2 rounded mt-2 text-sm"
-            value={blocks.costStructure}
-            onChange={(e) => setBlocks({ ...blocks, costStructure: e.target.value })}
-            placeholder="Kos utama dalam model"
-          />
-        </div>
-        <div className="p-3 border rounded-lg bg-white shadow-sm">
-          <div className="font-semibold text-gray-700">Aliran Pendapatan</div>
-          <textarea
-            className="w-full border p-2 rounded mt-2 text-sm"
-            value={blocks.revenueStreams}
-            onChange={(e) => setBlocks({ ...blocks, revenueStreams: e.target.value })}
-            placeholder="Aliran hasil utama"
-          />
-        </div>
+        <BmcBlock
+          blockKey="costStructure"
+          value={blocks.costStructure}
+          onChange={(v) => setBlocks({ ...blocks, costStructure: v })}
+          placeholder="Kos utama dalam model"
+        />
+        <BmcBlock
+          blockKey="revenueStreams"
+          value={blocks.revenueStreams}
+          onChange={(v) => setBlocks({ ...blocks, revenueStreams: v })}
+          placeholder="Aliran hasil utama"
+        />
       </div>
     </div>
   );
 }
-
-

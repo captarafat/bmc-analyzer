@@ -223,14 +223,30 @@ export default function TrainerPage() {
   );
 }
 
+const BMC_CONFIG = {
+  'Rakan Kongsi Utama': { icon: '🤝', bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-800', header: 'bg-blue-100' },
+  'Aktiviti Utama': { icon: '⚡', bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-800', header: 'bg-purple-100' },
+  'Sumber Utama': { icon: '🏭', bg: 'bg-indigo-50', border: 'border-indigo-200', text: 'text-indigo-800', header: 'bg-indigo-100' },
+  'Tawaran Nilai': { icon: '🎁', bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-800', header: 'bg-emerald-100' },
+  'Hubungan dengan Pelanggan': { icon: '❤️', bg: 'bg-pink-50', border: 'border-pink-200', text: 'text-pink-800', header: 'bg-pink-100' },
+  'Saluran': { icon: '🚚', bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-800', header: 'bg-orange-100' },
+  'Segmen Pelanggan': { icon: '👥', bg: 'bg-cyan-50', border: 'border-cyan-200', text: 'text-cyan-800', header: 'bg-cyan-100' },
+  'Struktur Kos': { icon: '💰', bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-800', header: 'bg-red-100' },
+  'Aliran Pendapatan': { icon: '💵', bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-800', header: 'bg-green-100' },
+};
+
 function Block({ title, value, score, className = '' }) {
+  const config = BMC_CONFIG[title] || { icon: '📋', bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-800', header: 'bg-gray-100' };
   return (
-    <div className={`relative p-3 border rounded-lg bg-white shadow-sm min-h-[120px] ${className}`}>
-      <div className="font-semibold text-gray-700 mb-1 pr-10">{title}</div>
-      {typeof score === 'number' ? (
-        <div className="absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full bg-primary-600 text-white">{score.toFixed(1)}/10</div>
-      ) : null}
-      <div className="text-sm text-gray-700 whitespace-pre-line">{value || '-'}</div>
+    <div className={`relative p-3 border-2 rounded-lg shadow-sm min-h-[120px] ${config.bg} ${config.border} ${className}`}>
+      <div className={`${config.header} ${config.text} px-2 py-1.5 rounded mb-2 flex items-center gap-2 pr-10`}>
+        <span className="text-lg">{config.icon}</span>
+        <span className="font-semibold text-sm">{title}</span>
+        {typeof score === 'number' ? (
+          <div className="ml-auto text-xs px-2 py-0.5 rounded-full bg-primary-600 text-white">{score.toFixed(1)}/10</div>
+        ) : null}
+      </div>
+      <div className={`text-sm ${config.text} whitespace-pre-line`}>{value || '-'}</div>
     </div>
   );
 }
