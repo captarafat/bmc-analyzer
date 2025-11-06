@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Komponen utiliti ringkas */
+.card {
+  @apply bg-white shadow-sm border rounded-lg;
+}
+
+.card-header {
+  @apply px-4 py-2 border-b font-semibold text-gray-700;
+}
+
+.card-body {
+  @apply p-4;
+}
+
+textarea.bmc-input {
+  @apply w-full min-h-[120px] resize-y rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 text-sm p-3 bg-white;
+}
+
+input.input {
+  @apply w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 text-sm p-2.5 bg-white;
+}
+
+button.primary {
+  @apply inline-flex items-center justify-center rounded-md bg-primary-600 px-4 py-2 text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 text-sm font-medium;
+}
+
+button.secondary {
+  @apply inline-flex items-center justify-center rounded-md bg-gray-100 px-3 py-2 text-gray-800 hover:bg-gray-200 text-sm font-medium;
+}
+
+
