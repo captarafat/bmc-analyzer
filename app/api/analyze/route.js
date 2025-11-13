@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { getDefaultSessionId, saveEntry } from '../../../lib/db';
+import { getActiveSessionId, saveEntry } from '../../../lib/db';
 
 const BLOCK_KEYS = [
   'keyPartners',
@@ -185,7 +185,8 @@ export async function POST(request) {
 
   // Simpan ke database
   try {
-    const sid = sessionId || await getDefaultSessionId();
+    // Use provided sessionId, or fallback to active session (for students)
+    const sid = sessionId || await getActiveSessionId();
     const createdAt = Date.now();
     
     const entryId = await saveEntry(sid, {

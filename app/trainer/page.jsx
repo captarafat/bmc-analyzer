@@ -9,6 +9,7 @@ export default function TrainerPage() {
   const [selected, setSelected] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [sessionId, setSessionId] = useState('');
+  const [activeSessionId, setActiveSessionId] = useState('');
 
   async function load() {
     try {
@@ -17,6 +18,11 @@ export default function TrainerPage() {
       const sData = await sRes.json();
       const sessionsList = sData.sessions || [];
       setSessions(sessionsList);
+      
+      // Update active session
+      if (sData.activeSessionId) {
+        setActiveSessionId(sData.activeSessionId);
+      }
       
       // Set sessionId if not set or if current sessionId doesn't exist
       let currentSessionId = sessionId;
@@ -40,6 +46,21 @@ export default function TrainerPage() {
       setItems([]);
     } finally {
       setLoading(false);
+    }
+  }
+  
+  async function handleSessionChange(newSessionId) {
+    setSessionId(newSessionId);
+    // Set as active session so student submissions go here
+    try {
+      await fetch('/api/sessions/active', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: newSessionId }),
+      });
+      setActiveSessionId(newSessionId);
+    } catch (error) {
+      console.error('Failed to set active session:', error);
     }
   }
 
@@ -86,6 +107,10 @@ export default function TrainerPage() {
     if (json?.session) {
       setSessions((prev) => [json.session, ...prev]);
       setSessionId(json.session.id);
+      // New session is automatically set as active
+      if (json.activeSessionId) {
+        setActiveSessionId(json.activeSessionId);
+      }
     }
   }
 
@@ -104,9 +129,11 @@ export default function TrainerPage() {
           <span className="text-xs bg-primary-600 text-white rounded-full px-2 py-0.5">{items.length}</span>
         </h2>
         <div className="flex items-center gap-2">
-          <select className="input !py-1" value={sessionId} onChange={(e) => setSessionId(e.target.value)}>
+          <select className="input !py-1" value={sessionId} onChange={(e) => handleSessionChange(e.target.value)}>
             {sessions.map((s) => (
-              <option key={s.id} value={s.id}>{s.name}</option>
+              <option key={s.id} value={s.id}>
+                {s.name} {s.id === activeSessionId ? '⭐' : ''}
+              </option>
             ))}
           </select>
           <button className="secondary" onClick={createSession}>Tambah Sesi</button>
