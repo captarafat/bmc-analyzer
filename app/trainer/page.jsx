@@ -87,16 +87,29 @@ export default function TrainerPage() {
     }
   }
 
-  async function deleteEntry(at) {
+  async function deleteEntry(entryAt) {
     if (!confirm('Padam penghantaran ini? Tindakan ini tidak boleh diundur.')) return;
     try {
-      await fetch('/api/leaderboard', {
+      console.log('Deleting entry:', { at: entryAt, sessionId });
+      const res = await fetch('/api/leaderboard', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ at }),
+        body: JSON.stringify({ at: entryAt, sessionId }),
       });
+      const data = await res.json();
+      console.log('Delete response:', data);
+      
+      if (!res.ok) {
+        alert(`Ralat: ${data.error || 'Gagal memadam entry'}`);
+        return;
+      }
+      
+      // Reload leaderboard
       await load();
-    } catch (_e) {}
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Ralat ketika memadam entry. Cuba lagi.');
+    }
   }
 
   async function createSession() {
